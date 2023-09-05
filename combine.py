@@ -44,18 +44,28 @@ if __name__ == "__main__":
     word_combinations = []
 
     # Helper function to find combinations of words that form the user's input
-    def find_combinations(remaining_letters, current_combination):
+    def find_combinations(remaining_letters, current_combination, words_found_in):
         if not remaining_letters:
             word_combinations.append(current_combination)
             return
-        for word in words_found:
+        
+        # Create a copy of words_found to avoid modifying the original list
+        local_words_found = list(words_found_in)
+        
+        for word in local_words_found:
+            # print("Try",word)
             if all(remaining_letters.count(c) >= word.count(c) for c in word):
                 new_remaining = remaining_letters
                 for letter in word:
                     new_remaining = new_remaining.replace(letter, '', 1)
-                find_combinations(new_remaining, current_combination + [word])
+                
+                # Remove the used word from local_words_found
+                local_words_found.remove(word)
+                # print("  Removed",word)
+                
+                find_combinations(new_remaining, current_combination + [word], local_words_found)
 
-    find_combinations(input_string, [])
+    find_combinations(input_string, [], words_found)
 
     if word_combinations:
         print("Combinations of words that form the user's input:")
