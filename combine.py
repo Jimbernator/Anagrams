@@ -1,4 +1,5 @@
-from itertools import permutations
+import threading
+import sys  # Import sys module
 
 # Function to load English words from a dictionary file with a minimum word length
 def load_dictionary(dictionary_file, min_word_length=1, num_words=50000):
@@ -17,17 +18,28 @@ def load_dictionary(dictionary_file, min_word_length=1, num_words=50000):
 def find_individual_words(input_string, dictionary):
     return [word for word in dictionary if all(input_string.count(c) >= word.count(c) for c in word)]
 
+# Handler function to terminate the execution on timeout
+def timeout_handler():
+    print("Operation timed out. Try a shorter input or lower minimum word length.")
+    sys.exit(0)  # Terminate the program inline
+
 if __name__ == "__main__":
     dictionary_file = "en-2012/en.txt"  # Replace with the path to your dictionary file
     input_string = input("Enter the input string: ").lower()
     min_word_length = int(input("Enter the minimum word length: "))
+    timeout_seconds = int(input("Enter the timeout in seconds: "))
 
     # Load the first 50,000 words from the dictionary with the specified minimum word length
     dictionary = load_dictionary(dictionary_file, min_word_length, num_words=5000)
 
+    # Set a timeout using a separate thread
+    timeout_thread = threading.Timer(timeout_seconds, timeout_handler)
+    timeout_thread.start()
+
     # Find individual dictionary words that can be made using the user's input
     words_found = find_individual_words(input_string, dictionary)
     print(words_found[:10])
+
     # Initialize a list to store combinations of words
     word_combinations = []
 
@@ -51,3 +63,6 @@ if __name__ == "__main__":
             print(' '.join(combination))
     else:
         print("No valid combinations found.")
+
+    # Cancel the timeout thread at the end of the program
+    timeout_thread.cancel()
