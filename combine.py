@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     # Find individual dictionary words that can be made using the user's input
     words_found = find_individual_words(input_string, dictionary)
-    print(words_found[:10])
+    print(words_found[:40])
 
     # Initialize a list to store combinations of words
     word_combinations = []
