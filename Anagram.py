@@ -1,33 +1,37 @@
 import re
+import itertools
 
 # Function to load the English words and their frequencies from a dictionary file
 def load_dictionary(dictionary_file):
-    dictionary = {}
+    dictionary = set()
     with open(dictionary_file, 'r', encoding='utf-8') as file:
         for line in file:
-            word, frequency = line.strip().split()
-            dictionary[word.lower()] = int(frequency)
+            word, _ = line.strip().split()
+            dictionary.add(word.lower())
     return dictionary
 
 # Function to generate anagrams
 def generate_anagrams(input_string, dictionary):
     input_string = re.sub(r'[^a-zA-Z]', '', input_string).lower()
     results = []
+    stack = [(('', input_string),)]
 
-    # Recursive function to find anagrams
-    def find_anagrams(current_anagram, remaining_string, current_frequency):
+    while stack:
+        try:
+            (current_anagram, remaining_string), *rest = stack
+        except ValueError:
+            break  # Exit the loop if the stack is empty
         if not remaining_string:
             results.append(current_anagram)
-            return
+        else:
+            for word_length in range(1, len(remaining_string) + 1):
+                for combination in itertools.permutations(remaining_string, word_length):
+                    word = ''.join(combination)
+                    if word in dictionary:
+                        new_anagram = current_anagram + " " + word if current_anagram else word
+                        new_remaining = remaining_string.replace(word, '', 1)
+                        stack.append((new_anagram, new_remaining))
 
-        for word in dictionary:
-            if remaining_string.startswith(word):
-                new_anagram = current_anagram + " " + word if current_anagram else word
-                new_remaining = remaining_string[len(word):]
-                new_frequency = current_frequency + dictionary[word]
-                find_anagrams(new_anagram, new_remaining, new_frequency)
-
-    find_anagrams('', input_string, 0)
     return results
 
 if __name__ == "__main__":
