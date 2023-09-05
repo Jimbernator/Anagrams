@@ -1,12 +1,12 @@
 import re
-import itertools
+from itertools import permutations
 
-# Function to load the English words and their frequencies from a dictionary file
+# Function to load the English words from a dictionary file
 def load_dictionary(dictionary_file):
     dictionary = set()
     with open(dictionary_file, 'r', encoding='utf-8') as file:
         for line in file:
-            word, _ = line.strip().split()
+            word, _ = line.strip().split()  # Split the line into word and frequency
             dictionary.add(word.lower())
     return dictionary
 
@@ -14,23 +14,16 @@ def load_dictionary(dictionary_file):
 def generate_anagrams(input_string, dictionary):
     input_string = re.sub(r'[^a-zA-Z]', '', input_string).lower()
     results = []
-    stack = [(('', input_string),)]
 
-    while stack:
-        try:
-            (current_anagram, remaining_string), *rest = stack
-        except ValueError:
-            break  # Exit the loop if the stack is empty
-        if not remaining_string:
-            results.append(current_anagram)
-        else:
-            for word_length in range(1, len(remaining_string) + 1):
-                for combination in itertools.permutations(remaining_string, word_length):
-                    word = ''.join(combination)
-                    if word in dictionary:
-                        new_anagram = current_anagram + " " + word if current_anagram else word
-                        new_remaining = remaining_string.replace(word, '', 1)
-                        stack.append((new_anagram, new_remaining))
+    # Generate all permutations of the input string
+    permutations_list = [''.join(perm) for perm in permutations(input_string)]
+
+    print("Permutations:", permutations_list[:5])
+
+    # Filter valid anagrams
+    for permuted_string in permutations_list:
+        if permuted_string in dictionary:
+            results.append(permuted_string)
 
     return results
 
@@ -39,6 +32,8 @@ if __name__ == "__main__":
     input_string = input("Enter the input string: ")
 
     dictionary = load_dictionary(dictionary_file)
+    print("Loaded Dictionary (First 5 entries):", list(dictionary)[:5])
+
     anagrams = generate_anagrams(input_string, dictionary)
 
     if anagrams:
