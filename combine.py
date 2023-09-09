@@ -54,7 +54,7 @@ if __name__ == "__main__":
         # Create a copy of words_found to avoid modifying the original list
         local_words_found = list(words_found_in)
         
-        for word in local_words_found:
+        for word in words_found_in:
             print("Try",word, current_combination)
             if all(remaining_letters.count(c) >= word.count(c) for c in word):
                 new_remaining = remaining_letters
