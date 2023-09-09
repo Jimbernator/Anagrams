@@ -29,9 +29,11 @@ if __name__ == "__main__":
     min_word_length = int(input("Enter the minimum word length: "))
     timeout_seconds = int(input("Enter the timeout in seconds: "))
     num_words = int(input("Enter dictionary size: "))  # Recommended 5000
+    # block_word = input("Enter word to block from results: ").lower()
 
     # Load the first 50,000 words from the dictionary with the specified minimum word length
     dictionary = load_dictionary(dictionary_file, min_word_length, num_words)
+    # dictionary.remove(block_word)
 
     # Set a timeout using a separate thread
     timeout_thread = threading.Timer(timeout_seconds, timeout_handler)
