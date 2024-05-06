@@ -14,21 +14,83 @@ def load_dictionary(dictionary_file, min_word_length=1, num_words=50000):
                 dictionary.append(word)
     return dictionary
 
+
+
+
 # Function to find individual dictionary words that can be made using a given string
 def find_individual_words(input_string, dictionary):
     return [word for word in dictionary if all(input_string.count(c) >= word.count(c) for c in word)]
+
+
+
 
 # Handler function to terminate the execution on timeout
 def timeout_handler():
     print("Operation timed out. Try a shorter input or lower minimum word length.")
     sys.exit(0)  # Terminate the program inline
 
+
+
+
+# Function to find combinations of words that form the user's input
+def find_combinations(input_string, words_found):
+    stack = []
+    wordCount = len(words_found)
+    print("wordCount: ", wordCount)
+    remaining_letters=[input_string]
+    index = 0
+    depth = 0 # Depth in stack
+    word_combinations  = []
+
+    while (not (stack == [] and index == wordCount)):
+
+        while (index == wordCount):
+            if stack == []:
+                return word_combinations
+            index = stack.pop()
+            remaining_letters.pop()
+            # Add back the letters of index
+            depth = depth - 1
+            index = index + 1
+
+        word = words_found[index]
+        # Check if all letters in the current word can be formed from the remaining letters
+        if all(remaining_letters[depth].count(c) >= word.count(c) for c in word):
+            # If so, add the word to the current combination
+            stack.append(index)
+            depth = depth + 1
+            # Remove the letters of the word from the remaining letters
+            remaining_letters.append([])
+            remaining_letters[depth] = remaining_letters[depth - 1]
+            for letter in word:
+                remaining_letters[depth] = remaining_letters[depth].replace(letter, '', 1)
+            # Check if all letters are used
+            if not remaining_letters[depth]:
+                # Save a solution
+                current_combination = []
+                for i in stack:
+                    current_combination = current_combination + [words_found[i]]
+                word_combinations.append(current_combination)
+        else:
+            index = index + 1
+
+    return word_combinations
+
+
+
+
 if __name__ == "__main__":
     dictionary_file = "en-2012/en.txt"  # Replace with the path to your dictionary file
-    input_string = input("Enter the input string: ").lower()
-    min_word_length = int(input("Enter the minimum word length: "))
-    timeout_seconds = int(input("Enter the timeout in seconds: "))
-    num_words = int(input("Enter dictionary size: "))  # Recommended 5000
+    if(0):
+        input_string = input("Enter the input string: ").lower()
+        min_word_length = int(input("Enter the minimum word length: "))
+        timeout_seconds = int(input("Enter the timeout in seconds: "))
+        num_words = int(input("Enter dictionary size: "))  # Recommended 5000
+    else:
+        input_string = "sirenbeans"
+        min_word_length = 5
+        timeout_seconds = 9
+        num_words = 5000  # Recommended 5000
     # block_word = input("Enter word to block from results: ").lower()
 
     # Load the first 50,000 words from the dictionary with the specified minimum word length
@@ -43,31 +105,8 @@ if __name__ == "__main__":
     words_found = find_individual_words(input_string, dictionary)
     print(words_found[:40])
 
-    # Initialize a list to store combinations of words
-    word_combinations = []
-
-    # Helper function to find combinations of words that form the user's input
-    def find_combinations(remaining_letters, current_combination, words_found_in):
-        if not remaining_letters:
-            word_combinations.append(current_combination)
-            return
-
-        # Create a copy of words_found to avoid modifying the original list
-        local_words_found = list(words_found_in)
-        for word in words_found_in:
-            # Check if all letters in the current word can be formed from the remaining letters
-            if all(remaining_letters.count(c) >= word.count(c) for c in word):
-                # If so, add the word to the current combination
-                new_remaining = remaining_letters
-                # Remove the letters of the word from the remaining letters
-                for letter in word:
-                    new_remaining = new_remaining.replace(letter, '', 1)
-                # Recursively find combinations with updated remaining letters and combination
-                find_combinations(new_remaining, current_combination + [word], local_words_found)
-            # Remove the used word from local_words_found to avoid O(n!) algorithm.
-            local_words_found.remove(word)
-
-    find_combinations(input_string, [], words_found)
+    # find_combinations(input_string, [], words_found)
+    word_combinations = find_combinations(input_string, words_found)
 
     if word_combinations:
         print("Combinations of words that form the user's input:")
