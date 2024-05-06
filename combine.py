@@ -34,47 +34,51 @@ def timeout_handler():
 
 # Function to find combinations of words that form the user's input
 def find_combinations(input_string, words_found):
+    # Initialize an empty stack to keep track of word indices forming the combination
     stack = []
-    wordCount = len(words_found)
-    print("wordCount: ", wordCount)
-    remaining_letters=[input_string]
+    # Initialize an empty list to store the word combinations
+    word_combinations = []
+    # Initialize a list to keep track of remaining letters after each word is used
+    remaining_letters = [input_string]
+    # Initialize the index to traverse the list of words
     index = 0
-    depth = 0 # Depth in stack
-    word_combinations  = []
 
-    while (not (stack == [] and index == wordCount)):
-
-        while (index == wordCount):
-            if stack == []:
-                return word_combinations
+    # Continue looping until all combinations are explored
+    while True:
+        # Check if all words have been considered and the stack is empty
+        if index == len(words_found) and not stack:
+            break
+        
+        # If all words have been considered for the current combination,
+        # pop the last index from the stack and restore the remaining_letters
+        if index == len(words_found):
             index = stack.pop()
             remaining_letters.pop()
-            # Add back the letters of index
-            depth = depth - 1
-            index = index + 1
+            index += 1
+            # Run check agains
+            continue
 
+        # Retrieve the current word from the list of words
         word = words_found[index]
-        # Check if all letters in the current word can be formed from the remaining letters
-        if all(remaining_letters[depth].count(c) >= word.count(c) for c in word):
-            # If so, add the word to the current combination
+        # Check if the current word can be formed from the remaining letters
+        if all(remaining_letters[-1].count(c) >= word.count(c) for c in word):
+            # If so, add the index of the word to the stack
             stack.append(index)
-            depth = depth + 1
+            # Copy the remaining letters for the next word
+            remaining_letters.append(remaining_letters[-1])
             # Remove the letters of the word from the remaining letters
-            remaining_letters.append([])
-            remaining_letters[depth] = remaining_letters[depth - 1]
             for letter in word:
-                remaining_letters[depth] = remaining_letters[depth].replace(letter, '', 1)
-            # Check if all letters are used
-            if not remaining_letters[depth]:
-                # Save a solution
-                current_combination = []
-                for i in stack:
-                    current_combination = current_combination + [words_found[i]]
-                word_combinations.append(current_combination)
+                remaining_letters[-1] = remaining_letters[-1].replace(letter, '', 1)
+            # If all letters are used, horay! we've found an anagram
+            if not remaining_letters[-1]:
+                # Construct the current combination and add it to word_combinations
+                word_combinations.append([words_found[i] for i in stack])
         else:
-            index = index + 1
+            # Move to the next word only if the current word cannot be formed
+            index += 1
 
     return word_combinations
+
 
 
 
