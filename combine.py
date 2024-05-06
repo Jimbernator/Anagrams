@@ -55,10 +55,14 @@ if __name__ == "__main__":
         # Create a copy of words_found to avoid modifying the original list
         local_words_found = list(words_found_in)
         for word in words_found_in:
+            # Check if all letters in the current word can be formed from the remaining letters
             if all(remaining_letters.count(c) >= word.count(c) for c in word):
+                # If so, add the word to the current combination
                 new_remaining = remaining_letters
+                # Remove the letters of the word from the remaining letters
                 for letter in word:
                     new_remaining = new_remaining.replace(letter, '', 1)
+                # Recursively find combinations with updated remaining letters and combination
                 find_combinations(new_remaining, current_combination + [word], local_words_found)
             # Remove the used word from local_words_found to avoid O(n!) algorithm.
             local_words_found.remove(word)
