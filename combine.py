@@ -85,7 +85,7 @@ def find_combinations(input_string, words_found):
 
 if __name__ == "__main__":
     dictionary_file = "en-2012/en.txt"  # Replace with the path to your dictionary file
-    if(0):
+    if(1):
         input_string = input("Enter the input string: ").lower()
         min_word_length = int(input("Enter the minimum word length: "))
         timeout_seconds = int(input("Enter the timeout in seconds: "))
